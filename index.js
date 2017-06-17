@@ -2,9 +2,8 @@ const request = require("sync-request");
 const inquirer = require("inquirer");
 const { log } = console;
 
-const COOKIE_STRING =
-	"";
-const CAPTCHA_ANSWER = 4;
+let COOKIE_STRING = "";
+let CAPTCHA_ANSWER = 4;
 
 const GET_VIDEO =
 	"http://www.youlikehits.com/youtubenew2.php?step=reload&rand=0.1";
@@ -14,7 +13,8 @@ const USER_AGENT =
 const CAPTCHA_CHECKER = "Solve the Problem and Submit";
 const LOGIN_CHECKER = "Please login again";
 const CAPTCHA_RETRY_CHECKER = "You did not successfully solve the problem.";
-const VIEW_LENGTH_CHECKER = "You didn't view the video for the specified length of time";
+const VIEW_LENGTH_CHECKER =
+	"You didn't view the video for the specified length of time";
 const HOST = "http://www.youlikehits.com/";
 
 const options = {
@@ -58,8 +58,8 @@ const checkers = {
 		}
 		return true;
 	},
-	view_length_checker : function(response) {
-		if(response.includes(VIEW_LENGTH_CHECKER)) {
+	view_length_checker: function(response) {
+		if (response.includes(VIEW_LENGTH_CHECKER)) {
 			return false;
 		}
 		return true;
@@ -71,7 +71,7 @@ const exit = function(message) {
 	process.exit(0);
 };
 
-const wait = function (seconds = 1) {
+const wait = function(seconds = 1) {
 	let waitTill = new Date(new Date().getTime() + seconds * 1000);
 	while (waitTill > new Date()) {}
 	return true;
@@ -95,7 +95,6 @@ const solveCaptcha = function(times = 3) {
 	}
 };
 
-
 const requestURL = function(method, URL, options, checkers = [], times = 3) {
 	if (times === 0) {
 		exit("URL REQUEST PROBLEM" + URL);
@@ -116,53 +115,68 @@ const requestURL = function(method, URL, options, checkers = [], times = 3) {
 		? response
 		: requestURL(method, URL, options, checkers, --times);
 	return response;
-}
+};
 
-
-// const questions = [
-// 	{
-// 		type: "confirm",
-// 		name: "login",
-// 		message: "Did you login on youlikehits.com?",
-// 		default: false
-// 	},
-// 	{
-// 		type: "input",
-// 		name: "cookie",
-// 		message: "Please Copy Paste the Cookie you get on login",
-// 		default: false,
-// 		when: (answers) => {
-// 			if(!answers.login) {
-// 				log("You must login");
-// 				return false;
-// 			}
-// 			return true;
-// 		}
-// 	},
-// 	{
-// 		type: "input",
-// 		name: "captcha",
-// 		message: `I promise.. this is last step ..Go to view youtube and solve captcha and input result here`,
-// 		default: false,
-// 		when: (answers) => {
-// 			if(!answers.cookie) {
-// 				log("You must enter your cookie first");
-// 				return false;
-// 			}
-// 			return true;
-// 		}
-// 	},
-// ];
-// inquirer.prompt(questions).then(function(answers) {
-// 	console.log(answers);
-// });
+const questions = [
+	{
+		type: "confirm",
+		name: "login",
+		message: "Did you login on youlikehits.com?",
+		default: false
+	},
+	{
+		type: "input",
+		name: "cookie",
+		message: "Please Copy Paste the Cookie you get on login",
+		default: false,
+		when: answers => {
+			if (!answers.login) {
+				log("You must login");
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		type: "input",
+		name: "captcha",
+		message: `I promise.. this is last step ..Go to view youtube and solve captcha and input result here`,
+		default: false,
+		when: answers => {
+			if (!answers.cookie) {
+				log("You must enter your cookie first");
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		type: "input",
+		name: "times",
+		message: `Number of videos to watch ..you can enter ..default is 10 ;)`,
+		default: 10,
+		when: answers => {
+			if (!answers.login) {
+				log("You must login");
+				return false;
+			}
+			return true;
+		}
+	}
+];
+inquirer.prompt(questions).then(function(answers) {
+	COOKIE_STRING = answers.cookie;
+	CAPTCHA_ANSWER = answers.captcha;
+	let times = 0;
+	while (times < answers.times) {
+		viewVideo() ? times++ : null;
+	}
+});
 
 let count = 0;
 let counter = 0;
 
-while (count < 10) {
-	counter++;
-	console.log("Counter" + counter);
+function viewVideo() {
 	let response;
 	let defaultCheckers = [
 		checkers["captcha_checker"],
@@ -184,8 +198,11 @@ while (count < 10) {
 		return element.trim().replace(/'/g, "");
 	});
 	if (details.length !== 4) {
-		console.log("Skipped a video");
-		continue;
+		log(response);
+		log("Skipped a video");
+		log("If captcha is reason for skip..wait for retry ...");
+
+		return false;
 	}
 	log("Got a video :D");
 	let VIEW_VIDEO = `http://www.youlikehits.com/youtuberender.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
@@ -198,10 +215,13 @@ while (count < 10) {
 
 	// GET POINTS
 	const GET_POINTS = `http://www.youlikehits.com/playyoutubenew.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
-	
+
 	response = requestURL("GET", GET_POINTS, options, defaultCheckers);
-	log("Get Points");
-	log(response);
+	let pointsStart = response.indexOf("Points Added!") - 4;
+	let pointsEnd = response.indexOf("Points Added!") + "Points Added!".length;
+	let points = response.substring(pointsStart, pointsEnd);
+	let result = response.indexOf("Points Added!") !== -1 ? true : false;
+	result ? log(points) : null;
+
+	return false;
 }
-
-
