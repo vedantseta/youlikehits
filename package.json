@@ -1,15 +1,19 @@
 {
   "name": "youlikehits",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "You will get youlikehits points by running this ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Vedant Seta",
   "license": "ISC",
   "dependencies": {
     "request": "^2.81.0",
     "sync-request": "^4.1.0"
+  },
+  "devDependencies": {
+    "inquirer": "^3.1.0",
+    "prettier": "^1.4.4"
   }
 }
