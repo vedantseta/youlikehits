@@ -2,8 +2,7 @@ const request = require("sync-request");
 const inquirer = require("inquirer");
 const { log } = console;
 
-let COOKIE_STRING = "";
-let CAPTCHA_ANSWER = 4;
+let COOKIE_STRING, CAPTCHA_ANSWER;
 
 const GET_VIDEO =
 	"http://www.youlikehits.com/youtubenew2.php?step=reload&rand=0.1";
@@ -13,8 +12,7 @@ const USER_AGENT =
 const CAPTCHA_CHECKER = "Solve the Problem and Submit";
 const LOGIN_CHECKER = "Please login again";
 const CAPTCHA_RETRY_CHECKER = "You did not successfully solve the problem.";
-const VIEW_LENGTH_CHECKER =
-	"You didn't view the video for the specified length of time";
+const VIEW_LENGTH_CHECKER = "You didn't view the video for the specified length of time";
 const HOST = "http://www.youlikehits.com/";
 
 const options = {
@@ -173,9 +171,6 @@ inquirer.prompt(questions).then(function(answers) {
 	}
 });
 
-let count = 0;
-let counter = 0;
-
 function viewVideo() {
 	let response;
 	let defaultCheckers = [
@@ -197,6 +192,7 @@ function viewVideo() {
 	details = details.split(",").map(function(element) {
 		return element.trim().replace(/'/g, "");
 	});
+
 	if (details.length !== 4) {
 		log(response);
 		log("Skipped a video");
@@ -204,6 +200,7 @@ function viewVideo() {
 
 		return false;
 	}
+
 	log("Got a video :D");
 	let VIEW_VIDEO = `http://www.youlikehits.com/youtuberender.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
 	response = requestURL("GET", VIEW_VIDEO, options, defaultCheckers);
