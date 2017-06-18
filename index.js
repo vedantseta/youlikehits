@@ -46,7 +46,7 @@ const checkers = {
 	},
 	login_checker: function(response) {
 		if (response.includes(LOGIN_CHECKER)) {
-			// exit("LOGIN IS REQUIRED");
+			exit("LOGIN IS REQUIRED");
 		}
 		return true;
 	},
@@ -102,8 +102,6 @@ const requestURL = function(method, URL, options, checkers = [], times = 3) {
 	try {
 		response = request(method, URL, options);
 		response = response.getBody("utf8");
-		console.log(method, URL, options);
-		console.log('Hesdsa'+ response);
 		let passed = checkers.reduce(function(result, currentFunction) {
 			return result && currentFunction(response);
 		}, true);
