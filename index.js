@@ -166,6 +166,17 @@ const questions = [
 function setOptions(cookieString) {
 	options['headers']['Cookie'] = cookieString;
 }
+
+function updateOptions() {
+	let cookieString = options['headers']['Cookie'];
+	let idStart = cookieString.indexOf("_pk_id.1.6009")+"_pk_id.1.6009".length;
+	let idEnd = cookieString.indexOf(";", idStart);
+	let id = cookieString.substring(idStart, idEnd);
+	let arrId = id.split(".");
+	cookieString = options['headers']['Cookie'].replace(arrId[3], Date.now()); 
+	options['headers']['Cookie'] = cookieString;
+}
+
 function setCaptchaAnswer(answer) {
 	CAPTCHA_ANSWER = answer;
 }
@@ -228,5 +239,6 @@ function viewVideo() {
 	let result = response.indexOf("Points Added!") !== -1 ? true : false;
 	result ? log(points) : null;
 
+	updateOptions();
 	return false;
 }
