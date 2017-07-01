@@ -174,6 +174,14 @@ function updateOptions() {
 	let id = cookieString.substring(idStart, idEnd);
 	let arrId = id.split(".");
 	cookieString = options['headers']['Cookie'].replace(arrId[3], Date.now()); 
+	
+	idStart = cookieString.indexOf("__utma")+"__utma".length;
+	idEnd = cookieString.indexOf(";", idStart);
+	id = cookieString.substring(idStart, idEnd);
+	arrId = id.split(".");
+	cookieString = options['headers']['Cookie'].replace(arrId[3], Date.now()); 
+	
+
 	options['headers']['Cookie'] = cookieString;
 }
 
