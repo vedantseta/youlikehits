@@ -1,11 +1,24 @@
 const request = require("sync-request");
 const inquirer = require("inquirer");
+const sync = require('child_process').execSync;
+
 const { log } = console;
+
+let answers = {
+	"cookie" : process.env.npm_config_cookie,
+	"captcha" : process.env.npm_config_captcha,
+	"runTimes" : process.env.npm_config_times
+};
+String.prototype.replaceAll = function(str1, str2, ignore) 
+{
+    return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+} 
+
 
 let COOKIE_STRING, CAPTCHA_ANSWER;
 
 const GET_VIDEO =
-	"http://www.youlikehits.com/youtubenew2.php?step=reload&rand=0.1";
+	"https://www.youlikehits.com/youtubenew2.php?step=reload&rand=0.1";
 const USER_AGENT =
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
 
@@ -13,9 +26,10 @@ const CAPTCHA_CHECKER = "Solve the Problem and Submit";
 const LOGIN_CHECKER = "Please login again";
 const CAPTCHA_RETRY_CHECKER = "You did not successfully solve the problem.";
 const VIEW_LENGTH_CHECKER = "You didn't view the video for the specified length of time";
-const HOST = "http://www.youlikehits.com/";
+const HOST = "https://www.youlikehits.com/";
+const CUSTOM_COOKIE_STRING = process.env.npm_config_custom;
 
-const options = {
+let options = {
 	headers: {
 		Cookie: COOKIE_STRING,
 		"User-Agent": USER_AGENT
@@ -46,6 +60,7 @@ const checkers = {
 	},
 	login_checker: function(response) {
 		if (response.includes(LOGIN_CHECKER)) {
+			console.log(options);
 			exit("LOGIN IS REQUIRED");
 		}
 		return true;
@@ -94,15 +109,21 @@ const solveCaptcha = function(times = 3) {
 };
 
 const requestURL = function(method, URL, options, checkers = [], times = 3) {
+		let response,
+		passed = true;
+		response = request(method, URL, options);
+		response = response.getBody("utf8")
 	if (times === 0) {
+		console.log();
+		console.log(URL, method, options);
+		console.log(response);
 		exit("URL REQUEST PROBLEM" + URL);
 	}
-	let response,
-		passed = true;
+
+
 	try {
-		response = request(method, URL, options);
-		response = response.getBody("utf8");
-		let passed = checkers.reduce(function(result, currentFunction) {
+;
+		passed = checkers.reduce(function(result, currentFunction) {
 			return result && currentFunction(response);
 		}, true);
 	} catch (e) {
@@ -169,28 +190,55 @@ function setOptions(cookieString) {
 
 function updateOptions() {
 	let cookieString = options['headers']['Cookie'];
-	let idStart = cookieString.indexOf("_pk_id.1.6009")+"_pk_id.1.6009".length;
+	let customString = "_pk_id.1."+CUSTOM_COOKIE_STRING;
+	let idStart = cookieString.indexOf(customString)+(customString).length;
 	let idEnd = cookieString.indexOf(";", idStart);
 	let id = cookieString.substring(idStart, idEnd);
 	let arrId = id.split(".");
-	cookieString = options['headers']['Cookie'].replace(arrId[3], Date.now()); 
+	let date = Math.round((new Date()).getTime() / 1000);	
+
+	cookieString = cookieString.replaceAll(arrId[3], ''+date); 
+	cookieString = cookieString.replaceAll(arrId[4], ''+date); 
+	idStart = cookieString.indexOf("__utma")+"__utma".length;
+	idEnd = cookieString.indexOf(";", idStart);
+	id = cookieString.substring(idStart, idEnd);
+	arrId = id.split(".");
+
+	cookieString = cookieString.replaceAll(arrId[3], ''+date); 
 	options['headers']['Cookie'] = cookieString;
+	process.env['sccookie'] = cookieString;
+
 }
 
 function setCaptchaAnswer(answer) {
 	CAPTCHA_ANSWER = answer;
 }
-inquirer.prompt(questions).then(function(answers) {
-	setOptions(answers.cookie);
-	setCaptchaAnswer(answers.captcha);
-	let total = parseInt(answers.times);
-	let times = 0;
-	while (times < total) {
-		viewVideo() ? times++ : null;
+
+function startSoundCloud() {
+	let command = `npm run scrunner --sccookie="${options.headers.Cookie}"`;
+	sync(command, {stdio:[0,1,2]});
+}
+
+function startYoutube() {
+	let total = parseInt(answers.runTimes);
+	let currentTime = 0;
+
+	while (currentTime < total) {
+		viewVideo() ? currentTime++ : null;
 	}
-});
+}
+function init() {
+	setOptions(answers.cookie);
+	updateOptions();
+	setCaptchaAnswer(answers.captcha);
+	startYoutube();
+	startSoundCloud();
+
+};
 
 function viewVideo() {
+	updateOptions();
+
 	let response;
 	let defaultCheckers = [
 		checkers["captcha_checker"],
@@ -221,7 +269,7 @@ function viewVideo() {
 	}
 
 	log("Got a video :D");
-	let VIEW_VIDEO = `http://www.youlikehits.com/youtuberender.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
+	let VIEW_VIDEO = `https://www.youlikehits.com/youtuberender.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
 	response = requestURL("GET", VIEW_VIDEO, options, defaultCheckers);
 
 	// WAIT
@@ -230,7 +278,7 @@ function viewVideo() {
 	let waiting = wait(seconds);
 
 	// GET POINTS
-	const GET_POINTS = `http://www.youlikehits.com/playyoutubenew.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
+	const GET_POINTS = `https://www.youlikehits.com/playyoutubenew.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
 
 	response = requestURL("GET", GET_POINTS, options, defaultCheckers);
 	let pointsStart = response.indexOf("Points Added!") - 4;
@@ -240,5 +288,9 @@ function viewVideo() {
 	result ? log(points) : null;
 
 	updateOptions();
-	return false;
+	return true;
 }
+
+
+
+init();

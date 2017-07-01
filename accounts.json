@@ -1,0 +1,16 @@
+{
+	"accounts" : [
+		{
+			"cookie" : "",
+			"times" : 10,
+			"captcha" : 2,
+			"custom_cookie_string" : "6009"
+		},
+		{
+			"cookie" : "",
+			"times" : 10,
+			"captcha" : -2,
+			"custom_cookie_string" : "4ef9"
+		}
+	]
+}
