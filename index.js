@@ -1,5 +1,7 @@
 const request = require("sync-request");
 const inquirer = require("inquirer");
+const notifier = require('node-notifier');
+
 const { log } = console;
 
 let COOKIE_STRING, CAPTCHA_ANSWER;
@@ -46,6 +48,7 @@ const checkers = {
 	},
 	login_checker: function(response) {
 		if (response.includes(LOGIN_CHECKER)) {
+			notifier.notify('You are logged out');
 			exit("LOGIN IS REQUIRED");
 		}
 		return true;
@@ -174,14 +177,15 @@ function updateOptions() {
 	let id = cookieString.substring(idStart, idEnd);
 	let arrId = id.split(".");
 	cookieString = options['headers']['Cookie'].replace(arrId[3], Date.now()); 
-	
+	cookieString = options['headers']['Cookie'].replace(arrId[4], Date.now()); 
+
 	idStart = cookieString.indexOf("__utma")+"__utma".length;
 	idEnd = cookieString.indexOf(";", idStart);
 	id = cookieString.substring(idStart, idEnd);
 	arrId = id.split(".");
 	cookieString = options['headers']['Cookie'].replace(arrId[3], Date.now()); 
-	
 
+	console.log(cookieString);
 	options['headers']['Cookie'] = cookieString;
 }
 
@@ -190,6 +194,7 @@ function setCaptchaAnswer(answer) {
 }
 inquirer.prompt(questions).then(function(answers) {
 	setOptions(answers.cookie);
+	updateOptions();
 	setCaptchaAnswer(answers.captcha);
 	let total = parseInt(answers.times);
 	let times = 0;
