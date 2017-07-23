@@ -4,6 +4,13 @@ const notifier = require('node-notifier');
 
 const { log } = console;
 
+const answers = {
+	"cookie" : process.env.cookie,
+	"captcha" : process.env.captcha,
+	"times" : 500
+};
+
+
 let COOKIE_STRING, CAPTCHA_ANSWER;
 
 const GET_VIDEO =
@@ -192,7 +199,8 @@ function updateOptions() {
 function setCaptchaAnswer(answer) {
 	CAPTCHA_ANSWER = answer;
 }
-inquirer.prompt(questions).then(function(answers) {
+
+function init() {
 	setOptions(answers.cookie);
 	updateOptions();
 	setCaptchaAnswer(answers.captcha);
@@ -201,7 +209,7 @@ inquirer.prompt(questions).then(function(answers) {
 	while (times < total) {
 		viewVideo() ? times++ : null;
 	}
-});
+};
 
 function viewVideo() {
 	let response;
@@ -255,3 +263,5 @@ function viewVideo() {
 	updateOptions();
 	return false;
 }
+
+init();
