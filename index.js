@@ -4,12 +4,12 @@ const notifier = require('node-notifier');
 
 const { log } = console;
 
-const answers = {
-	"cookie" : process.env.cookie,
-	"captcha" : process.env.captcha,
+let answers = {
+	"cookie" : process.env.npm_config_cookie,
+	"captcha" : process.env.npm_config_captcha,
 	"times" : 500
 };
-
+console.log(answers);
 
 let COOKIE_STRING, CAPTCHA_ANSWER;
 

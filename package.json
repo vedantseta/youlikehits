@@ -4,7 +4,9 @@
   "description": "You will get youlikehits points by running this ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "runner": "node index.js"
+
   },
   "author": "Vedant Seta",
   "license": "ISC",
