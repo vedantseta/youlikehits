@@ -7,7 +7,7 @@ const { log } = console;
 let COOKIE_STRING, CAPTCHA_ANSWER;
 
 const GET_VIDEO =
-	"http://www.youlikehits.com/youtubenew2.php?step=reload&rand=0.1";
+	"https://www.youlikehits.com/youtubenew2.php?step=reload&rand=0.1";
 const USER_AGENT =
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
 
@@ -15,7 +15,7 @@ const CAPTCHA_CHECKER = "Solve the Problem and Submit";
 const LOGIN_CHECKER = "Please login again";
 const CAPTCHA_RETRY_CHECKER = "You did not successfully solve the problem.";
 const VIEW_LENGTH_CHECKER = "You didn't view the video for the specified length of time";
-const HOST = "http://www.youlikehits.com/";
+const HOST = "https://www.youlikehits.com/";
 
 const options = {
 	headers: {
@@ -234,7 +234,7 @@ function viewVideo() {
 	}
 
 	log("Got a video :D");
-	let VIEW_VIDEO = `http://www.youlikehits.com/youtuberender.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
+	let VIEW_VIDEO = `https://www.youlikehits.com/youtuberender.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
 	response = requestURL("GET", VIEW_VIDEO, options, defaultCheckers);
 
 	// WAIT
@@ -243,7 +243,7 @@ function viewVideo() {
 	let waiting = wait(seconds);
 
 	// GET POINTS
-	const GET_POINTS = `http://www.youlikehits.com/playyoutubenew.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
+	const GET_POINTS = `https://www.youlikehits.com/playyoutubenew.php?id=${details[0]}&step=points&x=${details[3]}&rand=0.04596779850586352`;
 
 	response = requestURL("GET", GET_POINTS, options, defaultCheckers);
 	let pointsStart = response.indexOf("Points Added!") - 4;
