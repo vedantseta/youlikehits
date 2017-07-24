@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "runner": "node index.js"
-
+    "runner": "node index.js",
+    "scrunner": "node soundcloud.js"
   },
   "author": "Vedant Seta",
   "license": "ISC",
