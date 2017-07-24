@@ -1,6 +1,7 @@
 const request = require("sync-request");
 const inquirer = require("inquirer");
 const notifier = require('node-notifier');
+const sync = require('child_process').execSync;
 
 const { log } = console;
 
@@ -9,6 +10,8 @@ let answers = {
 	"captcha" : process.env.npm_config_captcha,
 	"times" : 500
 };
+
+
 console.log(answers);
 
 let COOKIE_STRING, CAPTCHA_ANSWER;
@@ -263,5 +266,8 @@ function viewVideo() {
 	updateOptions();
 	return false;
 }
+
+
+sync('npm run scrunner', {stdio:[0,1,2]});
 
 init();
