@@ -10,12 +10,17 @@ const options = {
     	'User-Agent' : USER_AGENT
 	}
 };
+const NO_SONGS = "There are no more songs to play for points. Check back later";
 let count = 0;
 while(count < 50) {
+	count++;
+
 	let response = request('GET', GET_VIDEO, options);
 	response = response.getBody('utf8');
 	console.log(response);
-
+	if (response.includes(NO_SONGS)) {
+		process.exit(0);
+	}
 	let detailsStart = response.indexOf("imageWin") + "imageWin(".length;
 	let detailsEnd = response.indexOf(");", detailsStart);
 	let details = response.substring(detailsStart, detailsEnd);
@@ -42,6 +47,5 @@ while(count < 50) {
 	response = response.getBody('utf8');
 	console.log(response);
 	console.log(count);
-	count++;
 }
 
