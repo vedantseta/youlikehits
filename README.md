@@ -1,3 +1,8 @@
+
+## UPDATE 
+
+Please have a look at https://github.com/vedantseta/you-like-hits-selenium
+
 ### Setup
 
 ```sh
